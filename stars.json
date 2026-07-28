@@ -1,0 +1,10 @@
+{
+  "pydoit/doit": 2075,
+  "pytest-dev/pytest-incremental": 55,
+  "schettino72/import-deps": 25,
+  "schettino72/mergedict": 14,
+  "schettino72/pytest-ignore-flaky": 6,
+  "schettino72/rut": 12,
+  "schettino72/sphinx_press_theme": 120,
+  "schettino72/sqla_yaml_fixtures": 14
+}

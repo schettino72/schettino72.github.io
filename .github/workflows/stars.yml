@@ -1,0 +1,33 @@
+name: Refresh star counts
+on:
+  schedule:
+    - cron: '0 6 * * 1'   # Mondays 06:00 UTC
+  workflow_dispatch: {}
+permissions:
+  contents: write
+jobs:
+  stars:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch stars → stars.json
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}   # authed = 5000 req/hr
+        run: |
+          repos=$(grep -oP 'data-repo="\K[^"]+' index.html | sort -u)
+          echo "{" > stars.json
+          first=1
+          for repo in $repos; do
+            count=$(gh api "repos/$repo" --jq '.stargazers_count')
+            [ $first -eq 0 ] && echo "," >> stars.json
+            printf '  "%s": %s' "$repo" "$count" >> stars.json
+            first=0
+          done
+          printf '\n}\n' >> stars.json
+      - name: Commit if changed
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add stars.json
+          git diff --cached --quiet || git commit -m "chore: refresh star counts"
+          git push
